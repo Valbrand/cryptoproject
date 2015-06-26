@@ -92,6 +92,11 @@ var keychain = function() {
     var received_obj = JSON.parse(repr);
     var hashed_pwd = bitarray_to_hex(SHA256(string_to_bitarray(password)));
     var result = false;
+    var hashed_repr = SHA256(string_to_bitarray(repr));
+
+    if (!bitarray_equal(hashed_repr, hex_to_bitarray(trusted_data_check))) {
+      throw "Ocorreu um erro no carregamento do banco serializado."
+    }
 
     if (received_obj.pwd_check == hashed_pwd) {
       var salt = hex_to_bitarray(received_obj.key_salt);
@@ -119,9 +124,10 @@ var keychain = function() {
   * Return Type: array
   */
   keychain.dump = function() {
+    var serialized_dump = JSON.stringify(priv.data);
     return [
-      JSON.stringify(priv.data, null, 2),
-      null
+      serialized_dump,
+      bitarray_to_hex(SHA256(string_to_bitarray(serialized_dump)))
     ];
   }
 
