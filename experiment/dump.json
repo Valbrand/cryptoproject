@@ -1,8 +1,0 @@
-{
-  "dump": {
-    "key_salt": "c9089b74a586777c69f14aa317703efbc9f274c754591e522b7a3ba20983ffce",
-    "pwd_check": "41d1591542ee1b075d4226f84e57c5dee1d71f92ea56e838c392a289223439d5",
-    "kvs": {}
-  },
-  "data_check": "1b14582da0afcb9e8f49bb25a3c9b9ea1a2facd393897372f7c901f4ce9a3b69"
-}

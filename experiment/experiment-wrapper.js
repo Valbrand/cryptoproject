@@ -15,6 +15,9 @@ function experiment() {
 		keychain = require('../password-manager').keychain();
 
 		keychain.init(master_password);
+		keychain.set("www.google.com", "googlepassword");
+		keychain.set("www.facebook.com", "facebookpassword");
+		keychain.set("www.quora.com", "googlepassword");
 	}
 
 	function init_world_bit() {

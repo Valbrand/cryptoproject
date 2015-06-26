@@ -149,15 +149,15 @@
 				if (result) {
 					console.log("Entrada '", args[0], "' removida com sucesso do banco de dados.");
 				} else {
-					console.log("Entrada '", args[0], "' não existente no banco de dados.");
+					console.log("Falha ao remover a entrada '", args[0], "' do banco de dados.");
 				}
 			} else {
 				console.log("Comando inválido!!");
 			}
-
-			sendPrompt();
+		} catch(e) {
+			console.log(e);
 		} finally {
-			//
+			sendPrompt();
 		}
 	}
 
