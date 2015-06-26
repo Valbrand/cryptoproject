@@ -112,7 +112,7 @@ var hex_to_byte_array = function(s) {
 };
 
 // Internal: you should not need this function.
-var word_to_bytes_acc = function(word, bytes) { 
+var word_to_bytes_acc = function(word, bytes) {
   // word is a nonnegative integer, at most 2^31-1
   if (word < 0) {
     throw "word_to_bytes_acc: can't convert negative integer";
