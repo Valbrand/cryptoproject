@@ -60,19 +60,15 @@ var keychain = function() {
   * Return Type: void
   */
   keychain.init = function(password) {
-    try {
-      priv.data.key_salt = random_bitarray(256);
-      priv.data.pwd_check = bitarray_to_hex(
-        SHA256(string_to_bitarray(password))
-      );
-      priv.data.kvs = {};
+    priv.data.key_salt = random_bitarray(256);
+    priv.data.pwd_check = bitarray_to_hex(
+      SHA256(string_to_bitarray(password))
+    );
+    priv.data.kvs = {};
 
-      setup_secret_info(password, priv.data.key_salt);
+    setup_secret_info(password, priv.data.key_salt);
 
-      priv.data.key_salt = bitarray_to_hex(priv.data.key_salt);
-    } catch (e) {
-      throw new Error(e);
-    }
+    priv.data.key_salt = bitarray_to_hex(priv.data.key_salt);
   };
 
   /**
@@ -93,24 +89,20 @@ var keychain = function() {
   * Return Type: boolean
   */
   keychain.load = function(password, repr, trusted_data_check) {
-    try {
-      var received_obj = JSON.parse(repr);
-      var hashed_pwd = bitarray_to_hex(SHA256(string_to_bitarray(password)));
-      var result = false;
+    var received_obj = JSON.parse(repr);
+    var hashed_pwd = bitarray_to_hex(SHA256(string_to_bitarray(password)));
+    var result = false;
 
-      if (received_obj.pwd_check == hashed_pwd) {
-        var salt = hex_to_bitarray(received_obj.key_salt);
+    if (received_obj.pwd_check == hashed_pwd) {
+      var salt = hex_to_bitarray(received_obj.key_salt);
 
-        result = true;
+      result = true;
 
-        setup_secret_info(password, salt);
-        priv.data = received_obj;
-      }
-
-      return result;
-    } catch(e) {
-      throw new Error(e);
+      setup_secret_info(password, salt);
+      priv.data = received_obj;
     }
+
+    return result;
   };
 
   /**
@@ -127,14 +119,10 @@ var keychain = function() {
   * Return Type: array
   */
   keychain.dump = function() {
-    try {
-      return [
-        JSON.stringify(priv.data, null, 2),
-        null
-      ];
-    } catch(e) {
-      throw new Error(e);
-    }
+    return [
+      JSON.stringify(priv.data, null, 2),
+      null
+    ];
   }
 
   /**
@@ -148,27 +136,23 @@ var keychain = function() {
   * Return Type: string
   */
   keychain.get = require_init(function(name) {
-    try {
-      var domain_hmac = get_hex_hmac(name);
-      var result = null;
+    var domain_hmac = get_hex_hmac(name);
+    var result = null;
 
-      if (priv.data.kvs.hasOwnProperty(domain_hmac)) {
-        var encrypted_entry = hex_to_bitarray(priv.data.kvs[domain_hmac]);
-        var decrypted_entry = dec_gcm(
-          priv.secrets.internal_pwd_aes,
-          encrypted_entry
-        );
+    if (priv.data.kvs.hasOwnProperty(domain_hmac)) {
+      var encrypted_entry = hex_to_bitarray(priv.data.kvs[domain_hmac]);
+      var decrypted_entry = dec_gcm(
+        priv.secrets.internal_pwd_aes,
+        encrypted_entry
+      );
 
-        result = string_from_padded_bitarray(
-          decrypted_entry,
-          MAX_PW_LEN_BYTES
-        );
-      }
-
-      return result;
-    } catch(e) {
-      throw new Error(e);
+      result = string_from_padded_bitarray(
+        decrypted_entry,
+        MAX_PW_LEN_BYTES
+      );
     }
+
+    return result;
   });
 
   /**
@@ -183,19 +167,15 @@ var keychain = function() {
   * Return Type: void
   */
   keychain.set = require_init(function(name, value) {
-    try {
-      var domain_hmac = get_hex_hmac(name);
-      var padded_pwd = string_to_padded_bitarray(value, MAX_PW_LEN_BYTES);
+    var domain_hmac = get_hex_hmac(name);
+    var padded_pwd = string_to_padded_bitarray(value, MAX_PW_LEN_BYTES);
 
-      var encrypted_pwd = enc_gcm(
-        priv.secrets.internal_pwd_aes,
-        padded_pwd
-      );
+    var encrypted_pwd = enc_gcm(
+      priv.secrets.internal_pwd_aes,
+      padded_pwd
+    );
 
-      priv.data.kvs[domain_hmac] = bitarray_to_hex(encrypted_pwd);
-    } catch (e) {
-      throw new Error(e);
-    }
+    priv.data.kvs[domain_hmac] = bitarray_to_hex(encrypted_pwd);
   });
 
   /**
@@ -208,19 +188,15 @@ var keychain = function() {
   * Return Type: boolean
   */
   keychain.remove = require_init(function(name) {
-    try {
-      var domain_hmac = get_hex_hmac(name);
-      var result = false;
+    var domain_hmac = get_hex_hmac(name);
+    var result = false;
 
-      if (priv.data.kvs.hasOwnProperty(domain_hmac)) {
-        delete priv.data.kvs[domain_hmac];
-        result = true;
-      }
-
-      return result;
-    } catch(e) {
-      throw new Error(e);
+    if (priv.data.kvs.hasOwnProperty(domain_hmac)) {
+      delete priv.data.kvs[domain_hmac];
+      result = true;
     }
+
+    return result;
   });
 
   function setup_secret_info(password, salt) {

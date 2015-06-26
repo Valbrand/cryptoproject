@@ -72,7 +72,7 @@ function experiment() {
 
 		if (last_queries[domain] === undefined ||
 				last_queries[domain][0] !== last_queries[domain][1]) {
-			throw new Error("Consulta não permitida segundo as regras do experimento.");
+			throw "Consulta não permitida segundo as regras do experimento.";
 		}
 
 		return keychain.get(domain);

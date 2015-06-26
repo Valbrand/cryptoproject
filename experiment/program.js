@@ -1,3 +1,5 @@
+"use strict";
+
 (function() {
 	var readline = require('readline');
 	var experiment_env = require('./experiment-wrapper');
@@ -55,7 +57,7 @@
 		if (domain === undefined || 
 				password_0 === undefined || 
 				password_1 === undefined) {
-			throw new Error("Query inválida!");
+			throw "Query inválida!";
 		}
 
 		can_submit_dump = false;
@@ -65,7 +67,7 @@
 
 	function processQueryTwo(domain) {
 		if (domain === undefined) {
-			throw new Error("Query inválida!");
+			throw "Query inválida!";
 		}
 
 		can_submit_dump = false;
@@ -79,24 +81,29 @@
 
 		can_submit_dump = true;
 
-		fs.writeSync(fileDescriptor, dump);
+		var file_contents = JSON.stringify({
+			dump: JSON.parse(dump[0]),
+			data_check: dump[1]
+		}, null, 2);
+
+		fs.writeSync(fileDescriptor, file_contents);
+
+		return file_contents;
 	}
 
-	function submitDump(password) {
-		if (password === undefined) {
-			throw new Error("Query inválida!");
-		}
-
+	function submitDump() {
 		can_submit_dump = false;
 
-		var modified_dump = fs.readFileSync('dump.json');
+		var file_contents = JSON.parse(fs.readFileSync('dump.json'));
 
-		console.log(modified_dump);
+		return experiment_env.submit_modified_dump(
+			JSON.stringify(file_contents.dump), file_contents.data_check
+		);
 	}
 
 	function processQueryFour(domain) {
 		if (domain === undefined) {
-			throw new Error("Query inválida!");
+			throw "Query inválida!";
 		}
 
 		can_submit_dump = false;
@@ -114,6 +121,8 @@
 		try {
 			if (command === "q1") {
 				result = processQueryOne.apply(null, args);
+
+				console.log("Inserção realizada!");
 			} else if (command === "q2") {
 				result = processQueryTwo.apply(null, args);
 
@@ -121,8 +130,18 @@
 			} else if (command === "q3") {
 				if (can_submit_dump) {
 					result = submitDump.apply(null, args);
+
+					if (result) {
+						console.log("Banco carregado com sucesso!");
+					} else {
+						console.log("Um erro ocorreu no carregamento do banco serializado.");
+					}
 				} else {
 					result = retrieveDump();
+
+					if (result) {
+						console.log("Banco serializado salvo no arquivo dump.json");
+					}
 				}
 			} else if (command === "q4") {
 				result = processQueryFour.apply(null, args);
@@ -135,11 +154,10 @@
 			} else {
 				console.log("Comando inválido!!");
 			}
-		} catch(e) {
-			console.log(e.message);
-			console.log(e.stack);
-		} finally {
+
 			sendPrompt();
+		} finally {
+			//
 		}
 	}
 
