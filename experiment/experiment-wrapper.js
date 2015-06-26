@@ -15,9 +15,9 @@ function experiment() {
 		keychain = require('../password-manager').keychain();
 
 		keychain.init(master_password);
-		keychain.set("www.google.com", "googlepassword");
-		keychain.set("www.facebook.com", "facebookpassword");
-		keychain.set("www.quora.com", "googlepassword");
+		//keychain.set("www.google.com", "googlepassword");
+		//keychain.set("www.facebook.com", "facebookpassword");
+		//keychain.set("www.quora.com", "googlepassword");
 	}
 
 	function init_world_bit() {
@@ -35,7 +35,7 @@ function experiment() {
 		last_queries[domain] = passwords;
 
 		return keychain.set(domain, passwords[WORLD_BIT]);
-	}
+	};
 
 	/**
 	* Query 2
@@ -45,7 +45,7 @@ function experiment() {
 
 		delete last_queries[domain];
 		return keychain.remove(domain);
-	}
+	};
 
 	/**
 	* Query 3
@@ -54,7 +54,7 @@ function experiment() {
 		can_submit_dump = true;
 
 		return keychain.dump();
-	}
+	};
 
 	/*
 	* Query 3 - parte 2
@@ -65,7 +65,7 @@ function experiment() {
 
 			return keychain.load(master_password, modified_dump, data_check);
 		}
-	}
+	};
 
 	/**
 	* Query 4
@@ -79,7 +79,7 @@ function experiment() {
 		}
 
 		return keychain.get(domain);
-	}
+	};
 
 	init();
 

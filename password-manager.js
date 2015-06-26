@@ -44,10 +44,6 @@ var keychain = function() {
 
   // Maximum length of each record in bytes
   var MAX_PW_LEN_BYTES = 64;
-  var SALT_LENGTH = 512;
-
-  // Flag to indicate whether password manager is "ready" or not
-  var ready = false;
 
   var keychain = {};
 
@@ -92,11 +88,6 @@ var keychain = function() {
     var received_obj = JSON.parse(repr);
     var hashed_pwd = bitarray_to_hex(SHA256(string_to_bitarray(password)));
     var result = false;
-    var hashed_repr = SHA256(string_to_bitarray(repr));
-
-    if (!bitarray_equal(hashed_repr, hex_to_bitarray(trusted_data_check))) {
-      throw "Ocorreu um erro no carregamento do banco serializado."
-    }
 
     if (received_obj.pwd_check == hashed_pwd) {
       var salt = hex_to_bitarray(received_obj.key_salt);
@@ -105,6 +96,10 @@ var keychain = function() {
 
       setup_secret_info(password, salt);
       priv.data = received_obj;
+
+      if (get_hex_hmac(repr) !== trusted_data_check) {
+        throw "Ocorreu um erro no carregamento do banco serializado."
+      }
     }
 
     return result;
@@ -125,11 +120,13 @@ var keychain = function() {
   */
   keychain.dump = function() {
     var serialized_dump = JSON.stringify(priv.data);
+    var to_be_hashed = string_to_bitarray(serialized_dump);
+
     return [
       serialized_dump,
-      bitarray_to_hex(SHA256(string_to_bitarray(serialized_dump)))
+      get_hex_hmac(to_be_hashed)
     ];
-  }
+  };
 
   /**
   * Fetches the data (as a string) corresponding to the given domain from the KVS.
@@ -232,6 +229,6 @@ var keychain = function() {
   }
 
   return keychain;
-}
+};
 
 module.exports.keychain = keychain;
