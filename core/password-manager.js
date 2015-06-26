@@ -57,13 +57,15 @@ var keychain = function() {
   */
   keychain.init = function(password) {
     priv.data.key_salt = random_bitarray(256);
+    priv.data.pwd_check_salt = random_bitarray(256);
     priv.data.pwd_check = bitarray_to_hex(
-      SHA256(string_to_bitarray(password))
+      SHA256(bitarray_concat(priv.data.pwd_check_salt, string_to_bitarray(password)))
     );
     priv.data.kvs = {};
 
     setup_secret_info(password, priv.data.key_salt);
 
+    priv.data.pwd_check_salt = bitarray_to_hex(priv.data.pwd_check_salt);
     priv.data.key_salt = bitarray_to_hex(priv.data.key_salt);
   };
 
@@ -86,20 +88,24 @@ var keychain = function() {
   */
   keychain.load = function(password, repr, trusted_data_check) {
     var received_obj = JSON.parse(repr);
-    var hashed_pwd = bitarray_to_hex(SHA256(string_to_bitarray(password)));
+    var hashed_pwd = bitarray_to_hex(
+        SHA256(bitarray_concat(
+            hex_to_bitarray(received_obj.pwd_check_salt),
+            string_to_bitarray(password)
+        ))
+    );
     var result = false;
 
     if (received_obj.pwd_check == hashed_pwd) {
       var salt = hex_to_bitarray(received_obj.key_salt);
-
-      result = true;
-
       setup_secret_info(password, salt);
-      priv.data = received_obj;
 
       if (get_hex_hmac(repr) !== trusted_data_check) {
         throw "Ocorreu um erro no carregamento do banco serializado."
       }
+
+      priv.data = received_obj;
+      result = true;
     }
 
     return result;

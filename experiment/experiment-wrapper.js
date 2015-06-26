@@ -56,7 +56,7 @@ function experiment() {
 		return keychain.dump();
 	};
 
-	/*
+	/**
 	* Query 3 - parte 2
 	*/
 	experiment_env.submit_modified_dump = function(modified_dump, data_check) {
@@ -73,7 +73,7 @@ function experiment() {
 	experiment_env.query_domain_data = function(domain) {
 		can_submit_dump = false;
 
-		if (last_queries[domain] === undefined ||
+		if (last_queries[domain] !== undefined &&
 				last_queries[domain][0] !== last_queries[domain][1]) {
 			throw "Consulta não permitida segundo as regras do experimento.";
 		}
