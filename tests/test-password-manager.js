@@ -7,7 +7,7 @@ function assert(condition, message) {
   }
 }
 
-var password_manager = require("./password-manager");
+var password_manager = require("./../core/password-manager");
 
 var password = "password123!!";
 var keychain = password_manager.keychain();

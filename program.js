@@ -2,7 +2,7 @@
 
 (function () {
   var readline = require('readline');
-  var experiment_env = require('./experiment-wrapper');
+  var experiment_env = require('./experiment/experiment-wrapper');
   var fs = require('fs');
   var can_submit_dump = false;
   var rl = readline.createInterface({

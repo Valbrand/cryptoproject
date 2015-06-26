@@ -1,6 +1,6 @@
 "use strict";
 
-var lib = require('../lib');
+var lib = require('../core/lib');
 
 function experiment() {
 	var experiment_env = {},
@@ -12,7 +12,7 @@ function experiment() {
 		console.log("Inicializando ambiente do experimento...");
 
 		WORLD_BIT = init_world_bit();
-		keychain = require('../password-manager').keychain();
+		keychain = require('../core/password-manager').keychain();
 
 		keychain.init(master_password);
 		//keychain.set("www.google.com", "googlepassword");
